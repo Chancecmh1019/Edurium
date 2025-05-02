@@ -233,8 +233,8 @@ class _GradesTabState extends State<GradesTab> with SingleTickerProviderStateMix
                           ),
                         )
                       : ListView.builder(
-                          padding: const EdgeInsets.all(16),
                           itemCount: filteredGrades.length,
+                          padding: const EdgeInsets.only(bottom: 120), // 為 FAB 留出空間
                           itemBuilder: (context, index) {
                             final grade = filteredGrades[index];
                             final subject = grade.subjectId != null 

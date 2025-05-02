@@ -42,7 +42,10 @@ class GradesTab extends StatelessWidget {
           itemCount: grades.length,
           itemBuilder: (context, index) {
             final grade = grades[index];
-            return _GradeCard(grade: grade);
+            return _GradeCard(
+              grade: grade,
+              onTap: () => _navigateToGradeDetail(grade),
+            );
           },
         );
       },

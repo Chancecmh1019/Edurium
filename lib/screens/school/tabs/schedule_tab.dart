@@ -271,7 +271,7 @@ class _ScheduleTabState extends State<ScheduleTab> {
     bool isZh,
   ) {
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
       itemCount: periodTimes.length,
       itemBuilder: (context, index) {
         // 時間段索引從1開始，對應periodTimes從0開始

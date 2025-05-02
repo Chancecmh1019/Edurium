@@ -5,6 +5,8 @@ import 'package:edurium/widgets/common/app_card.dart';
 import 'package:edurium/utils/navigation_handler.dart';
 import 'package:edurium/utils/route_constants.dart';
 import 'package:edurium/models/task.dart';
+import 'package:edurium/screens/add_task/add_task_screen.dart';
+import 'package:edurium/screens/add_grade_screen.dart';
 
 /// 首頁上的快速操作卡片
 class QuickActionsCard extends StatelessWidget {
@@ -29,29 +31,38 @@ class QuickActionsCard extends StatelessWidget {
                 icon: Icons.assignment_add,
                 label: isZh ? '加入作業' : 'Add Homework',
                 color: Colors.amber.shade700,
-                onTap: () => NavigationHandler.navigateTo(
-                  context, 
-                  AppRoutes.addTask, 
-                  arguments: {'initialTaskType': TaskType.homework}
-                ),
+                onTap: () {
+                  // 導航到添加任務頁面，使用路由名稱
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.addTask,
+                    arguments: {'initialTaskType': TaskType.homework},
+                  );
+                },
               ),
               _buildActionButton(
                 context,
                 icon: Icons.quiz,
                 label: isZh ? '加入考試' : 'Add Exam',
                 color: Colors.red.shade700,
-                onTap: () => NavigationHandler.navigateTo(
-                  context, 
-                  AppRoutes.addTask, 
-                  arguments: {'initialTaskType': TaskType.exam}
-                ),
+                onTap: () {
+                  // 導航到添加任務頁面，使用路由名稱
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.addTask,
+                    arguments: {'initialTaskType': TaskType.exam},
+                  );
+                },
               ),
               _buildActionButton(
                 context,
                 icon: Icons.grade,
                 label: isZh ? '記錄成績' : 'Add Grade',
                 color: Colors.green.shade700,
-                onTap: () => NavigationHandler.navigateTo(context, AppRoutes.addGrade),
+                onTap: () {
+                  // 使用路由名稱導航到添加成績頁面
+                  Navigator.pushNamed(context, AppRoutes.addGrade);
+                },
               ),
             ],
           ),
@@ -68,11 +79,11 @@ class QuickActionsCard extends StatelessWidget {
                 label: isZh ? '查看課表' : 'Schedule',
                 color: Colors.indigo.shade400,
                 onTap: () {
-                  // 切換到學校標籤並選擇課表選項卡
-                  NavigationHandler.navigateTo(
-                    context, 
-                    AppRoutes.main, 
-                    arguments: {'tabIndex': 2, 'subTabIndex': 2}
+                  // 直接導航到學校頁面，指定課表標籤
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.school,
+                    arguments: {'initialTabIndex': 2}, // 課表標籤
                   );
                 },
               ),
@@ -82,11 +93,11 @@ class QuickActionsCard extends StatelessWidget {
                 label: isZh ? '教師信息' : 'Teachers',
                 color: Colors.purple.shade400,
                 onTap: () {
-                  // 切換到學校標籤並選擇教師選項卡
-                  NavigationHandler.navigateTo(
-                    context, 
-                    AppRoutes.main, 
-                    arguments: {'tabIndex': 2, 'subTabIndex': 3}
+                  // 直接導航到學校頁面，指定教師標籤
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.school,
+                    arguments: {'initialTabIndex': 3}, // 教師標籤
                   );
                 },
               ),
@@ -96,11 +107,11 @@ class QuickActionsCard extends StatelessWidget {
                 label: isZh ? '成績統計' : 'Analytics',
                 color: Colors.teal.shade700,
                 onTap: () {
-                  // 切換到學校標籤並選擇成績選項卡
-                  NavigationHandler.navigateTo(
-                    context, 
-                    AppRoutes.main, 
-                    arguments: {'tabIndex': 2, 'subTabIndex': 1}
+                  // 直接導航到學校頁面，指定成績標籤
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.school,
+                    arguments: {'initialTabIndex': 1}, // 成績標籤
                   );
                 },
               ),

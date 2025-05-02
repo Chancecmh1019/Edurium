@@ -189,17 +189,48 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // 導航到新增任務頁面，預設設置選中的日期
-          NavigationHandler.navigateTo(
-            context, 
-            '/add_task',
-            arguments: _selectedDay ?? _focusedDay,
-          );
-        },
-        tooltip: '新增行程',
-        child: const Icon(Icons.add),
+      floatingActionButton: Container(
+        margin: const EdgeInsets.only(bottom: 8.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(32),
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).colorScheme.tertiary.withOpacity(0.4),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Theme.of(context).colorScheme.tertiaryContainer,
+              Theme.of(context).colorScheme.tertiary,
+            ],
+          ),
+        ),
+        child: FloatingActionButton.extended(
+          onPressed: () {
+            // 導航到新增任務頁面，預設設置選中的日期
+            NavigationHandler.navigateTo(
+              context, 
+              '/add_task',
+              arguments: _selectedDay ?? _focusedDay,
+            );
+          },
+          icon: const Icon(Icons.add_task),
+          label: Text(
+            '新增任務',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+            ),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          foregroundColor: Theme.of(context).colorScheme.onTertiaryContainer,
+          extendedPadding: const EdgeInsets.symmetric(horizontal: 20),
+        ),
       ),
     );
   }

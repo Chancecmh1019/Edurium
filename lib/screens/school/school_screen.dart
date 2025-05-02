@@ -34,6 +34,17 @@ class SchoolScreenState extends State<SchoolScreen> with SingleTickerProviderSta
         setState(() {});
       }
     });
+    
+    // 處理初始標籤索引
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args is Map<String, dynamic> && args.containsKey('initialTabIndex')) {
+        final initialTabIndex = args['initialTabIndex'] as int;
+        if (initialTabIndex >= 0 && initialTabIndex < tabController.length) {
+          switchToTab(initialTabIndex);
+        }
+      }
+    });
   }
   
   @override
@@ -389,7 +400,7 @@ class SchoolScreenState extends State<SchoolScreen> with SingleTickerProviderSta
       required Widget child,
     }) {
       return Container(
-        margin: const EdgeInsets.only(bottom: 8.0, right: 4.0),
+        margin: const EdgeInsets.only(bottom: 80.0, right: 4.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           boxShadow: [

@@ -228,55 +228,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: MotivationQuotesCard(),
                   ),
                   
-                  const SizedBox(height: 100), // 增加底部間距，確保內容不被遮擋
+                  const SizedBox(height: 120), // 增加底部間距，確保內容不被遮擋
                 ]),
               ),
             ),
           ],
-        ),
-      ),
-      floatingActionButton: Container(
-        margin: const EdgeInsets.only(bottom: 8.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(32),
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(context).colorScheme.tertiary.withOpacity(0.4),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Theme.of(context).colorScheme.tertiaryContainer,
-              Theme.of(context).colorScheme.tertiary,
-            ],
-          ),
-        ),
-        child: FloatingActionButton.extended(
-          onPressed: () {
-            // 導航到新增任務頁面
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const AddTaskScreen(),
-              ),
-            );
-          },
-          icon: const Icon(Icons.add_task),
-          label: Text(
-            _newTaskButtonText,
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
-            ),
-          ),
-          elevation: 0,  // 移除內部陰影，使用外部裝飾容器的陰影
-          backgroundColor: Colors.transparent,  // 背景透明，使用外部容器的漸變色
-          foregroundColor: Theme.of(context).colorScheme.onTertiaryContainer,
-          extendedPadding: const EdgeInsets.symmetric(horizontal: 20),
         ),
       ),
     );

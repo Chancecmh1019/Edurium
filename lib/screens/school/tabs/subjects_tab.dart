@@ -148,7 +148,7 @@ class _SubjectsTabState extends State<SubjectsTab> {
                 )
               : ListView.builder(
                   itemCount: filteredSubjects.length,
-                  padding: const EdgeInsets.only(bottom: 80), // 為 FAB 留出空間
+                  padding: const EdgeInsets.only(bottom: 120), // 為 FAB 留出空間
                   itemBuilder: (context, index) {
                     final subject = filteredSubjects[index];
                     return _buildSubjectCard(subject, context);

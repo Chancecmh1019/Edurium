@@ -2,12 +2,20 @@ import 'package:flutter/material.dart';
 
 /// 處理應用內導航的工具類，提供一致的導航方法，採用Page API
 class NavigationHandler {
+  /// 應用程序的導航歷史記錄
+  static final List<PageData> _history = [];
+  
+  /// 首頁路由
+  static String _homeRoute = '/splash';
+  
   /// 初始化導航
   static String? _initialRoute;
   
   /// 初始化導航處理器
-  static void init(String initialRoute) {
-    _initialRoute = initialRoute;
+  static void init(String homeRoute) {
+    _homeRoute = homeRoute;
+    _initialRoute = null;
+    _history.clear();
   }
   
   /// 獲取初始路由
@@ -231,6 +239,30 @@ class NavigationHandler {
     }
     
     return mainScreenState;
+  }
+
+  /// 添加一個新頁面到歷史記錄中
+  static void addPage(String route, {Object? arguments, String? title}) {
+    _history.add(PageData(
+      route: route,
+      arguments: arguments,
+      title: title ?? route,
+    ));
+  }
+  
+  /// 創建一個自定義的平滑頁面路由
+  static SmoothPageRoute buildSmoothPageRoute({
+    required Widget page,
+    required String routeName,
+    Object? arguments,
+    bool fadeTransition = true,
+  }) {
+    return SmoothPageRoute(
+      page: page,
+      routeName: routeName,
+      arguments: arguments,
+      fadeTransition: fadeTransition,
+    );
   }
 }
 

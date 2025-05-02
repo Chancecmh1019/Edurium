@@ -16,17 +16,20 @@ import 'screens/school/screens/subject_detail_screen.dart';
 import 'screens/calendar/calendar_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/search/search_screen.dart';
+import 'screens/add_grade_screen.dart';
 import 'themes/app_theme.dart';
 import 'utils/constants.dart';
 import 'utils/navigation_handler.dart';
 import 'l10n/app_localizations.dart';
 import 'package:edurium/utils/route_constants.dart';
+import 'package:edurium/models/task.dart';
 
 // 臨時的AddTaskScreen實現
 class AddTaskScreen extends StatelessWidget {
   final DateTime? initialDate;
+  final TaskType? initialTaskType;
   
-  const AddTaskScreen({Key? key, this.initialDate}) : super(key: key);
+  const AddTaskScreen({Key? key, this.initialDate, this.initialTaskType}) : super(key: key);
   
   @override
   Widget build(BuildContext context) {
@@ -35,9 +38,37 @@ class AddTaskScreen extends StatelessWidget {
         title: const Text('新增任務'),
       ),
       body: Center(
-        child: Text('新增任務頁面 - 初始日期: ${initialDate?.toString() ?? "未設定"}'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('新增任務頁面'),
+            const SizedBox(height: 8),
+            Text('初始日期: ${initialDate?.toString() ?? "未設定"}'),
+            if (initialTaskType != null)
+              Text('任務類型: ${_getTaskTypeName(initialTaskType!)}'),
+          ],
+        ),
       ),
     );
+  }
+  
+  String _getTaskTypeName(TaskType type) {
+    switch (type) {
+      case TaskType.homework:
+        return '作業';
+      case TaskType.exam:
+        return '考試';
+      case TaskType.project:
+        return '專案';
+      case TaskType.reading:
+        return '閱讀';
+      case TaskType.meeting:
+        return '會議';
+      case TaskType.reminder:
+        return '提醒';
+      case TaskType.other:
+        return '其他';
+    }
   }
 }
 
@@ -168,12 +199,28 @@ class MyApp extends StatelessWidget {
               AppRoutes.school: (context) => const SchoolScreen(),
               AppRoutes.settings: (context) => const SettingsScreen(),
               AppRoutes.search: (context) => const SearchScreen(),
-              AppRoutes.addTask: (context) => AddTaskScreen(
-                initialDate: ModalRoute.of(context)?.settings.arguments as DateTime?,
-              ),
+              AppRoutes.addTask: (context) {
+                final args = ModalRoute.of(context)?.settings.arguments;
+                DateTime? initialDate;
+                TaskType? initialTaskType;
+                
+                if (args is DateTime) {
+                  initialDate = args;
+                } else if (args is Map<String, dynamic>) {
+                  initialDate = args['initialDate'] as DateTime?;
+                  if (args.containsKey('initialTaskType')) {
+                    initialTaskType = args['initialTaskType'] as TaskType;
+                  }
+                }
+                
+                return AddTaskScreen(
+                  initialDate: initialDate,
+                  initialTaskType: initialTaskType,
+                );
+              },
               AppRoutes.addSubject: (context) => const SubjectFormScreen(),
               AppRoutes.addTeacher: (context) => const Scaffold(body: Center(child: Text('新增教師頁面'))),
-              AppRoutes.addGrade: (context) => const Scaffold(body: Center(child: Text('新增成績頁面'))),
+              AppRoutes.addGrade: (context) => const AddGradeScreen(),
               AppRoutes.editSubject: (context) => SubjectFormScreen(
                 subjectId: ModalRoute.of(context)?.settings.arguments as String,
               ),
@@ -210,7 +257,7 @@ class MyApp extends StatelessWidget {
             // 使用自定義頁面轉場動畫
             onGenerateRoute: (settings) {
               // 這裡可以根據路由名稱進行條件判斷，返回不同的頁面
-              return SmoothPageRoute(
+              return NavigationHandler.buildSmoothPageRoute(
                 page: _buildPageFromSettings(settings),
                 routeName: settings.name ?? '/unknown',
                 arguments: settings.arguments,
@@ -245,14 +292,28 @@ class MyApp extends StatelessWidget {
       case AppRoutes.search:
         return const SearchScreen();
       case AppRoutes.addTask:
-        final initialDate = arguments as DateTime?;
-        return AddTaskScreen(initialDate: initialDate);
+        DateTime? initialDate;
+        TaskType? initialTaskType;
+        
+        if (arguments is DateTime) {
+          initialDate = arguments;
+        } else if (arguments is Map<String, dynamic>) {
+          initialDate = arguments['initialDate'] as DateTime?;
+          if (arguments.containsKey('initialTaskType')) {
+            initialTaskType = arguments['initialTaskType'] as TaskType;
+          }
+        }
+        
+        return AddTaskScreen(
+          initialDate: initialDate,
+          initialTaskType: initialTaskType,
+        );
       case AppRoutes.addSubject:
         return const SubjectFormScreen();
       case AppRoutes.addTeacher:
         return const Scaffold(body: Center(child: Text('新增教師頁面')));
       case AppRoutes.addGrade:
-        return const Scaffold(body: Center(child: Text('新增成績頁面')));
+        return const AddGradeScreen();
       case AppRoutes.editSubject:
         final subjectId = arguments as String;
         return SubjectFormScreen(subjectId: subjectId);
