@@ -235,6 +235,45 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
+      floatingActionButton: Container(
+        margin: const EdgeInsets.only(bottom: 80.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: [
+            BoxShadow(
+              color: theme.colorScheme.primary.withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              theme.colorScheme.primaryContainer,
+              theme.colorScheme.primary,
+            ],
+          ),
+        ),
+        child: FloatingActionButton(
+          onPressed: () {
+            // 導航到新增任務頁面
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AddTaskScreen(),
+              ),
+            );
+          },
+          tooltip: _newTaskButtonText,
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          foregroundColor: theme.colorScheme.onPrimary,
+          child: const Icon(Icons.add_task),
+        ),
+      ),
+      // 將浮動按鈕位置調整為右下角，避免與底部導航欄重疊
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
   

@@ -87,8 +87,10 @@ class SchoolScreenState extends State<SchoolScreen> with SingleTickerProviderSta
     final isZh = localeProvider.locale.languageCode == 'zh';
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode(context);
+    final theme = Theme.of(context);
     
     final tabTitles = _getTabTitles(isZh);
+    final fabTooltips = _getFabTooltips(isZh);
     
     return Scaffold(
       appBar: AppBar(
@@ -113,7 +115,52 @@ class SchoolScreenState extends State<SchoolScreen> with SingleTickerProviderSta
           TeachersTab(),
         ],
       ),
-      floatingActionButton: _buildFloatingActionButton(),
+      floatingActionButton: Container(
+        margin: const EdgeInsets.only(bottom: 80.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: [
+            BoxShadow(
+              color: theme.colorScheme.primary.withOpacity(0.4),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              theme.colorScheme.primaryContainer,
+              theme.colorScheme.primary,
+            ],
+          ),
+        ),
+        child: FloatingActionButton(
+          onPressed: () {
+            // 根據當前標籤導航到相應的頁面
+            switch (tabController.index) {
+              case 0: // 科目標籤頁
+                Navigator.pushNamed(context, '/add_subject');
+                break;
+              case 1: // 成績標籤頁
+                Navigator.pushNamed(context, '/add_grade');
+                break;
+              case 2: // 課表標籤頁
+                Navigator.pushNamed(context, '/add_schedule');
+                break;
+              case 3: // 老師標籤頁
+                Navigator.pushNamed(context, '/add_teacher');
+                break;
+            }
+          },
+          tooltip: fabTooltips[tabController.index],
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          foregroundColor: theme.colorScheme.onPrimary,
+          child: const Icon(Icons.add),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
@@ -381,94 +428,5 @@ class SchoolScreenState extends State<SchoolScreen> with SingleTickerProviderSta
         );
       },
     );
-  }
-  
-  Widget? _buildFloatingActionButton() {
-    // 根據不同標籤頁顯示不同的浮動按鈕
-    final locale = Provider.of<LocaleProvider>(context).locale;
-    final isZh = locale.languageCode == 'zh';
-    final theme = Theme.of(context);
-    
-    // 當前選中的標籤頁
-    final selectedIndex = tabController.index;
-    final fabTooltips = _getFabTooltips(isZh);
-    
-    // 定義共用樣式
-    Widget buildStyledFab({
-      required VoidCallback onPressed,
-      required String tooltip,
-      required Widget child,
-    }) {
-      return Container(
-        margin: const EdgeInsets.only(bottom: 80.0, right: 4.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: theme.colorScheme.primary.withOpacity(0.4),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              theme.colorScheme.primaryContainer,
-              theme.colorScheme.primary,
-            ],
-          ),
-        ),
-        child: FloatingActionButton(
-          onPressed: onPressed,
-          tooltip: tooltip,
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          foregroundColor: theme.colorScheme.onPrimary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: child,
-        ),
-      );
-    }
-    
-    switch (selectedIndex) {
-      case 0: // 科目標籤頁
-        return buildStyledFab(
-          onPressed: () {
-            Navigator.pushNamed(context, '/add_subject');
-          },
-          tooltip: fabTooltips[0],
-          child: const Icon(Icons.add),
-        );
-      case 1: // 成績標籤頁
-        return buildStyledFab(
-          onPressed: () {
-            Navigator.pushNamed(context, '/add_grade');
-          },
-          tooltip: fabTooltips[1],
-          child: const Icon(Icons.add),
-        );
-      case 2: // 課表標籤頁
-        return buildStyledFab(
-          onPressed: () {
-            // 新增課表項目
-            Navigator.pushNamed(context, '/add_schedule');
-          },
-          tooltip: fabTooltips[2],
-          child: const Icon(Icons.add),
-        );
-      case 3: // 老師標籤頁
-        return buildStyledFab(
-          onPressed: () {
-            Navigator.pushNamed(context, '/add_teacher');
-          },
-          tooltip: fabTooltips[3],
-          child: const Icon(Icons.add),
-        );
-      default:
-        return null;
-    }
   }
 } 

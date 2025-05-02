@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:intl/intl.dart';
-import 'package:edurium/providers/task_provider.dart' hide isSameDay;
-import 'package:edurium/models/task.dart';
-import 'package:edurium/utils/date_utils.dart' as app_date_utils;
-import 'package:edurium/widgets/calendar/calendar_event_list.dart';
-import 'package:edurium/utils/navigation_handler.dart';
+import '../add_task/add_task_screen.dart';
+import '../../models/task.dart';
+import '../../providers/task_provider.dart';
+import '../../providers/locale_provider.dart';
+import '../../widgets/common/empty_state.dart';
+import '../../widgets/calendar/calendar_view_selector.dart';
+import '../../widgets/calendar/calendar_event_list.dart';
+import '../../utils/date_utils.dart' as app_date_utils;
+import '../../utils/navigation_handler.dart';
 
 // 視圖模式枚舉
 enum CalendarViewMode {
@@ -190,9 +193,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
         ],
       ),
       floatingActionButton: Container(
-        margin: const EdgeInsets.only(bottom: 8.0),
+        margin: const EdgeInsets.only(bottom: 80.0),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(32),
+          borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
               color: Theme.of(context).colorScheme.tertiary.withOpacity(0.4),
@@ -209,29 +212,25 @@ class _CalendarScreenState extends State<CalendarScreen> {
             ],
           ),
         ),
-        child: FloatingActionButton.extended(
+        child: FloatingActionButton(
           onPressed: () {
             // 導航到新增任務頁面，預設設置選中的日期
-            NavigationHandler.navigateTo(
+            Navigator.pushNamed(
               context, 
               '/add_task',
-              arguments: _selectedDay ?? _focusedDay,
+              arguments: {'initialDate': _selectedDay ?? _focusedDay},
             );
           },
-          icon: const Icon(Icons.add_task),
-          label: Text(
-            '新增任務',
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
-            ),
-          ),
+          tooltip: Provider.of<LocaleProvider>(context).locale.languageCode == 'zh' 
+              ? '新增任務' 
+              : 'Add Task',
           elevation: 0,
           backgroundColor: Colors.transparent,
           foregroundColor: Theme.of(context).colorScheme.onTertiaryContainer,
-          extendedPadding: const EdgeInsets.symmetric(horizontal: 20),
+          child: const Icon(Icons.add_task),
         ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
   

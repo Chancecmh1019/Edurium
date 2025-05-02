@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:edurium/providers/grade_provider.dart';
 import 'package:edurium/providers/subject_provider.dart';
 import 'package:edurium/models/grade.dart';
+import 'package:edurium/models/subject.dart';
 import 'package:edurium/utils/date_util.dart';
 
 class GradesTab extends StatelessWidget {
@@ -44,7 +45,7 @@ class GradesTab extends StatelessWidget {
             final grade = grades[index];
             return _GradeCard(
               grade: grade,
-              onTap: () => _navigateToGradeDetail(grade),
+              onTap: () => _navigateToGradeDetail(context, grade),
             );
           },
         );
@@ -52,83 +53,12 @@ class GradesTab extends StatelessWidget {
     );
   }
 
-  /// 確保輸入是一個有效的 Grade 對象
-  Grade _ensureGradeObject(dynamic input) {
-    if (input is Grade) {
-      return input;
-    } else if (input is String) {
-      // 假設輸入是 gradeId，嘗試從 GradeProvider 獲取
-      final gradeProvider = Provider.of<GradeProvider>(context, listen: false);
-      try {
-        return gradeProvider.getGradeById(input) ?? Grade(
-          id: '', 
-          title: '',
-          score: 0,
-          maxScore: 100,
-          date: DateTime.now(),
-          type: GradeType.homework,
-        );
-      } catch (e) {
-        debugPrint('無法找到 Grade 對象: $e');
-      }
-    }
-    
-    // 返回默認的空 Grade 對象
-    return Grade(
-      id: '', 
-      title: '',
-      score: 0,
-      maxScore: 100,
-      date: DateTime.now(),
-      type: GradeType.homework,
-    );
-  }
-
-  Widget _buildGradeItem(dynamic gradeData) {
-    if (gradeData == null) return const SizedBox.shrink();
-    
-    final Grade grade = gradeData is Grade ? gradeData : Grade.fromJson(gradeData);
-    if (!_isValidGrade(grade)) return const SizedBox.shrink();
-    
-    final Subject? subject = _getSubjectForGrade(grade);
-    
-    return _GradeCard(
-      grade: grade,
-      subject: subject,
-      onTap: () => _navigateToGradeDetail(grade),
-    );
-  }
-
-  Color _getGradeColor(double score) {
-    if (score >= 90) return Colors.green;
-    if (score >= 80) return Colors.blue;
-    if (score >= 70) return Colors.orange;
-    return Colors.red;
-  }
-
-  // 獲取成績對應的科目
-  Subject? _getSubjectForGrade(Grade grade) {
-    if (grade.subjectId == null) return null;
-    
-    final subjectProvider = Provider.of<SubjectProvider>(context, listen: false);
-    try {
-      return subjectProvider.getSubjectById(grade.subjectId!);
-    } catch (e) {
-      debugPrint('無法找到科目: $e');
-      return null;
-    }
-  }
-
-  void _navigateToGradeDetail(Grade grade) {
+  void _navigateToGradeDetail(BuildContext context, Grade grade) {
     // 導航到成績詳情頁面
     Navigator.of(context).pushNamed(
       '/grade_detail',
       arguments: grade.id,
     );
-  }
-
-  bool _isValidGrade(Grade grade) {
-    return grade.id != null && grade.value != null;
   }
 }
 
@@ -149,12 +79,12 @@ class _GradeCard extends StatelessWidget {
     final textTheme = theme.textTheme;
     
     // 獲取顏色
-    final Color gradeColor = _getGradeColor(grade.value ?? 0, context);
+    final Color gradeColor = _getGradeColor(grade.score, context);
     
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+        margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 0),
         decoration: BoxDecoration(
           color: theme.cardColor,
           borderRadius: BorderRadius.circular(12),
@@ -179,7 +109,7 @@ class _GradeCard extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    '${grade.value?.toStringAsFixed(1) ?? "N/A"}',
+                    '${grade.score.toStringAsFixed(1)}',
                     style: textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: gradeColor,
@@ -193,18 +123,18 @@ class _GradeCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      subject?.name ?? '未知科目',
+                      grade.title,
                       style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (grade.description != null && grade.description!.isNotEmpty)
+                    if (grade.comment != null && grade.comment!.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(top: 4.0),
                         child: Text(
-                          grade.description!,
+                          grade.comment!,
                           style: textTheme.bodySmall,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -241,11 +171,11 @@ class _GradeCard extends StatelessWidget {
   Color _getGradeColor(double value, BuildContext context) {
     final theme = Theme.of(context);
     
-    if (value >= 9.0) {
+    if (value >= 90.0) {
       return Colors.green;
-    } else if (value >= 7.0) {
+    } else if (value >= 70.0) {
       return Colors.blue;
-    } else if (value >= 5.0) {
+    } else if (value >= 60.0) {
       return Colors.orange;
     } else {
       return Colors.red;

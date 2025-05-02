@@ -215,41 +215,6 @@ class _MainScreenState extends State<MainScreen> {
           children: _pages,
         ),
       ),
-      floatingActionButton: _currentIndex == 0 ? Container(
-        margin: const EdgeInsets.only(bottom: 8.0, right: 4.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(28),
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: FloatingActionMenu(
-          items: _fabItems.map((item) => FloatingActionItem(
-            icon: item.icon,
-            label: item.label,
-            onPressed: item.onPressed,
-            heroTag: item.heroTag,
-            backgroundColor: item.backgroundColor,
-          )).toList(),
-          direction: FloatingActionMenuDirection.up,
-          mainButtonSize: 56,
-          childButtonSize: 48,
-          distance: 100,
-          spaceBetween: 25,
-          tooltip: _addNewLabel,
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          foregroundColor: Theme.of(context).colorScheme.onPrimary,
-          childBackgroundColor: Theme.of(context).colorScheme.secondary,
-          childForegroundColor: Theme.of(context).colorScheme.onSecondary,
-          useStaggeredAnimation: true,
-          labelPosition: LabelPosition.right,
-        ),
-      ) : null,
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       extendBody: true,
       bottomNavigationBar: EduriumBottomNavBar(
         currentIndex: _currentIndex,
