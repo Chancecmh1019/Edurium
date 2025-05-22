@@ -154,11 +154,15 @@ class EduriumAppBar extends StatelessWidget implements PreferredSizeWidget {
         }
       },
       style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(
-          Theme.of(context).colorScheme.surface,
+        backgroundColor: MaterialStateProperty.resolveWith<Color>(
+          (Set<MaterialState> states) => Theme.of(context).colorScheme.surfaceVariant,
         ),
-        padding: MaterialStateProperty.all(EdgeInsets.zero),
+        foregroundColor: MaterialStateProperty.resolveWith<Color>(
+          (Set<MaterialState> states) => Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
+        padding: MaterialStateProperty.all(const EdgeInsets.all(8.0)),
         shape: MaterialStateProperty.all(const CircleBorder()),
+        minimumSize: MaterialStateProperty.all(const Size(40, 40)),
       ),
     );
   }
@@ -261,12 +265,16 @@ class EduriumSliverAppBar extends StatelessWidget {
         }
       },
       style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(
-          Theme.of(context).colorScheme.surface,
+        backgroundColor: MaterialStateProperty.resolveWith<Color>(
+          (Set<MaterialState> states) => Theme.of(context).colorScheme.surfaceVariant,
         ),
-        padding: MaterialStateProperty.all(EdgeInsets.zero),
+        foregroundColor: MaterialStateProperty.resolveWith<Color>(
+          (Set<MaterialState> states) => Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
+        padding: MaterialStateProperty.all(const EdgeInsets.all(8.0)),
         shape: MaterialStateProperty.all(const CircleBorder()),
+        minimumSize: MaterialStateProperty.all(const Size(40, 40)),
       ),
     );
   }
-} 
+}

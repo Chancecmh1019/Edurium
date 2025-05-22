@@ -144,38 +144,71 @@ class NavigationHandler {
   }
 
   /// 導航到學校頁面的科目標籤
+  /// 
+  /// 此方法嘗試智能導航到學校頁面的科目標籤，如果可能，它會使用頁面控制器直接切換，
+  /// 否則會使用常規導航方法。
   static Future<dynamic> goToSubjectsTab(BuildContext context) async {
     try {
-      // 首先導航到主頁面
-      await navigateTo(context, '/main');
+      // 檢查是否已經在主頁面
+      bool isAlreadyInMainScreen = false;
+      try {
+        final currentState = _findMainScreenState(context);
+        isAlreadyInMainScreen = currentState != null;
+      } catch (e) {
+        debugPrint('檢查主頁面狀態時出錯: $e');
+      }
       
-      // 等待頁面加載
-      await Future.delayed(const Duration(milliseconds: 100));
+      // 如果不在主頁面，則導航到主頁面
+      if (!isAlreadyInMainScreen) {
+        await navigateTo(context, '/main');
+        // 等待頁面加載
+        await Future.delayed(const Duration(milliseconds: 150));
+      }
       
       // 獲取MainScreen實例
       final mainScreenState = _findMainScreenState(context);
       if (mainScreenState != null) {
-        // 切換到學校頁面（MainScreen中的第3個標籤）
-        mainScreenState.pageController.jumpToPage(2); // 學校標籤索引為2
+        // 獲取當前頁面索引
+        int currentIndex = -1;
+        try {
+          currentIndex = mainScreenState.pageController.page?.round() ?? -1;
+        } catch (e) {
+          debugPrint('獲取當前頁面索引時出錯: $e');
+        }
         
-        // 等待頁面切換完成
-        await Future.delayed(const Duration(milliseconds: 300));
+        // 如果不在學校頁面，切換到學校頁面（MainScreen中的第3個標籤）
+        if (currentIndex != 2) {
+          mainScreenState.pageController.jumpToPage(2); // 學校標籤索引為2
+          // 等待頁面切換完成
+          await Future.delayed(const Duration(milliseconds: 300));
+        }
         
         // 找到SchoolScreen實例
         final schoolScreenState = _findSchoolScreenState(context);
         if (schoolScreenState != null) {
-          // 切換到科目標籤
-          schoolScreenState.tabController.animateTo(0); // 科目是第一個標籤
+          // 獲取當前標籤索引
+          int currentTabIndex = -1;
+          try {
+            currentTabIndex = schoolScreenState.tabController.index;
+          } catch (e) {
+            debugPrint('獲取當前標籤索引時出錯: $e');
+          }
+          
+          // 如果不在科目標籤，切換到科目標籤
+          if (currentTabIndex != 0) {
+            // 切換到科目標籤
+            schoolScreenState.tabController.animateTo(0); // 科目是第一個標籤
+          }
           return null;
         }
       }
       
       // 如果無法通過Widget樹找到實例，則使用常規導航方法
-      return navigateTo(context, '/school');
+      return navigateTo(context, '/school', arguments: {'initialTabIndex': 0});
     } catch (e) {
       debugPrint('導航到科目標籤時出錯: $e');
-      // 出錯時回退到普通導航
-      return navigateTo(context, '/school');
+      // 出錯時回退到普通導航，並傳遞初始標籤索引
+      return navigateTo(context, '/school', arguments: {'initialTabIndex': 0});
     }
   }
   
@@ -184,21 +217,26 @@ class NavigationHandler {
     dynamic schoolScreenState;
     
     void findInContext(BuildContext context) {
-      context.visitChildElements((element) {
-        // 如果已經找到，則停止尋找
-        if (schoolScreenState != null) return;
-        
-        final state = (element as StatefulElement?)?.state;
-        
-        // 檢查是否是SchoolScreen的狀態
-        if (state != null && state.toString().contains('_SchoolScreenState')) {
-          schoolScreenState = state;
-          return;
-        }
-        
-        // 繼續在子元素中尋找
-        findInContext(element);
-      });
+      try {
+        context.visitChildElements((element) {
+          // 如果已經找到，則停止尋找
+          if (schoolScreenState != null) return;
+          
+          final state = (element as StatefulElement?)?.state;
+          
+          // 檢查是否是SchoolScreen的狀態 - 使用更精確的類型檢查
+          if (state != null && state.toString().contains('SchoolScreenState')) {
+            schoolScreenState = state;
+            return;
+          }
+          
+          // 繼續在子元素中尋找
+          findInContext(element);
+        });
+      } catch (e) {
+        // 忽略訪問元素時的錯誤
+        debugPrint('訪問元素時出錯: $e');
+      }
     }
     
     try {
@@ -215,21 +253,26 @@ class NavigationHandler {
     dynamic mainScreenState;
     
     void findInContext(BuildContext context) {
-      context.visitChildElements((element) {
-        // 如果已經找到，則停止尋找
-        if (mainScreenState != null) return;
-        
-        final state = (element as StatefulElement?)?.state;
-        
-        // 檢查是否是MainScreen的狀態
-        if (state != null && state.toString().contains('_MainScreenState')) {
-          mainScreenState = state;
-          return;
-        }
-        
-        // 繼續在子元素中尋找
-        findInContext(element);
-      });
+      try {
+        context.visitChildElements((element) {
+          // 如果已經找到，則停止尋找
+          if (mainScreenState != null) return;
+          
+          final state = (element as StatefulElement?)?.state;
+          
+          // 檢查是否是MainScreen的狀態 - 使用更精確的類型檢查
+          if (state != null && (state.toString().contains('_MainScreenState') || state.runtimeType.toString() == '_MainScreenState')) {
+            mainScreenState = state;
+            return;
+          }
+          
+          // 繼續在子元素中尋找
+          findInContext(element);
+        });
+      } catch (e) {
+        // 忽略訪問元素時的錯誤
+        debugPrint('訪問元素時出錯: $e');
+      }
     }
     
     try {
@@ -438,4 +481,4 @@ class SmoothPageRoute<T> extends PageRouteBuilder<T> {
       arguments: arguments,
     ),
   );
-} 
+}

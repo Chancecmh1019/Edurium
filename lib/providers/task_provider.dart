@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
+import 'package:table_calendar/table_calendar.dart';
 import '../models/models.dart';
 import '../services/database_service.dart';
 import 'package:edurium/utils/constants.dart';
@@ -9,17 +10,29 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class TaskProvider extends ChangeNotifier {
-  // 獲取任務盒子
-  Box<Task> get _taskBox => Hive.box<Task>(AppConstants.taskBoxName);
-  
+  late Box<Task> _taskBox;
   List<Task> _tasks = [];
+  List<String> _tags = [];
+  Map<String, int> _tagCounts = {};
   
   TaskProvider() {
-    _loadTasks();
+    _initBox();
+  }
+  
+  Future<void> _initBox() async {
+    _taskBox = await Hive.openBox<Task>('tasks');
+    await _loadTasks();
+    _updateTagStats();
   }
   
   // 獲取所有任務
   List<Task> get tasks => _tasks;
+  
+  // 獲取所有標籤
+  List<String> get tags => _tags;
+  
+  // 獲取標籤統計
+  Map<String, int> get tagCounts => _tagCounts;
   
   // 獲取未完成任務
   List<Task> get incompleteTasks => _tasks.where((task) => !task.isCompleted).toList();
@@ -121,6 +134,7 @@ class TaskProvider extends ChangeNotifier {
   // 加載所有任務
   Future<void> _loadTasks() async {
     _tasks = _taskBox.values.toList();
+    _tasks.sort((a, b) => a.dueDate.compareTo(b.dueDate));
     notifyListeners();
   }
   
@@ -131,8 +145,9 @@ class TaskProvider extends ChangeNotifier {
   
   // 添加任務
   Future<void> addTask(Task task) async {
-    await _taskBox.add(task);
-    notifyListeners();
+    await _taskBox.put(task.id, task);
+    _loadTasks();
+    _updateTagStats();
   }
   
   // 獲取本週完成的任務
@@ -195,6 +210,7 @@ class TaskProvider extends ChangeNotifier {
     DateTime? reminderTime,
   }) async {
     final id = const Uuid().v4();
+    final now = DateTime.now();
     final task = Task(
       id: id,
       title: title,
@@ -205,25 +221,29 @@ class TaskProvider extends ChangeNotifier {
       subjectId: subjectId,
       teacherId: teacherId,
       reminderTime: reminderTime,
+      createdAt: now,
+      updatedAt: now,
     );
-    
     await addTask(task);
     return task;
   }
   
   // 更新任務
   Future<void> updateTask(Task task) async {
-    await task.save();
-    notifyListeners();
+    await _taskBox.put(task.id, task);
+    _loadTasks();
+    _updateTagStats();
   }
   
   // 更新任務完成狀態
   Future<void> toggleTaskCompletion(String taskId) async {
     final task = _taskBox.get(taskId);
     if (task != null) {
-      final updatedTask = task.copyWith(isCompleted: !task.isCompleted);
-      await _taskBox.put(taskId, updatedTask);
-      _loadTasks();
+      final updatedTask = task.copyWith(
+        isCompleted: !task.isCompleted,
+        updatedAt: DateTime.now(),
+      );
+      await updateTask(updatedTask);
     }
   }
   
@@ -234,11 +254,9 @@ class TaskProvider extends ChangeNotifier {
   
   // 刪除任務
   Future<void> deleteTask(String taskId) async {
-    final task = _taskBox.get(taskId);
-    if (task != null) {
-      await _taskBox.delete(taskId);
-      _loadTasks();
-    }
+    await _taskBox.delete(taskId);
+    _loadTasks();
+    _updateTagStats();
   }
   
   // 批量刪除任務
@@ -247,12 +265,14 @@ class TaskProvider extends ChangeNotifier {
       await _taskBox.delete(id);
     }
     _loadTasks();
+    _updateTagStats();
   }
   
   // 清除所有任務
   Future<void> clearAllTasks() async {
     await _taskBox.clear();
     _loadTasks();
+    _updateTagStats();
   }
   
   // 設置任務狀態
@@ -277,6 +297,18 @@ class TaskProvider extends ChangeNotifier {
       return task.title.toLowerCase().contains(query) || 
              (task.description?.toLowerCase().contains(query) ?? false);
     }).toList();
+  }
+
+  // 更新標籤統計
+  void _updateTagStats() {
+    _tagCounts.clear();
+    for (var task in _tasks) {
+      for (var tag in task.tags) {
+        _tagCounts[tag] = (_tagCounts[tag] ?? 0) + 1;
+      }
+    }
+    _tags = _tagCounts.keys.toList()..sort();
+    notifyListeners();
   }
 }
 

@@ -4,6 +4,8 @@
 export 'navigation/bottom_nav_bar.dart';
 export 'navigation/expandable_fab.dart';
 export 'navigation/bottom_nav_item.dart';
+// export 'edurium_bottom_nav_bar.dart'; // 移除重複導出
+export 'edurium_app_bar.dart';
 
 // 首頁小部件
 export 'home/upcoming_tasks_card.dart';
@@ -22,4 +24,4 @@ export 'calendar/calendar_view_selector.dart';
 export 'common/app_card.dart';
 export 'common/section_header.dart';
 export 'common/empty_state.dart';
-export 'common/loading_indicator.dart'; 
+export 'common/loading_indicator.dart';

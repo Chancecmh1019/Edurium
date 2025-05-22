@@ -157,6 +157,7 @@ class DatabaseService {
     await subjectBox.put(subject2.id, subject2);
     
     // 插入任務數據
+    final now = DateTime.now();
     final task1 = Task(
       id: '1',
       title: '數學期中考',
@@ -166,6 +167,8 @@ class DatabaseService {
       priority: TaskPriority.high,
       subjectId: '1',
       teacherId: '1',
+      createdAt: now,
+      updatedAt: now,
     );
     
     final task2 = Task(
@@ -177,6 +180,8 @@ class DatabaseService {
       priority: TaskPriority.medium,
       subjectId: '2',
       teacherId: '2',
+      createdAt: now,
+      updatedAt: now,
     );
     
     await taskBox.put(task1.id, task1);
@@ -280,6 +285,9 @@ class DatabaseService {
       dueDate: now.add(const Duration(days: 2)),
       taskType: TaskType.homework,
       subjectId: subject1.id,
+      priority: TaskPriority.medium,
+      createdAt: now,
+      updatedAt: now,
     );
     
     final task2 = Task(
@@ -289,6 +297,9 @@ class DatabaseService {
       dueDate: now.add(const Duration(days: 5)),
       taskType: TaskType.exam,
       subjectId: subject2.id,
+      priority: TaskPriority.high,
+      createdAt: now,
+      updatedAt: now,
     );
     
     await getTaskBox().putAll({

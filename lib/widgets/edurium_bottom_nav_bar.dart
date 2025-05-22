@@ -77,11 +77,15 @@ class BottomNavItem {
   final IconData? activeIcon;
   final String label;
   final String? tooltip;
+  final bool hasNotification;
+  final int notificationCount;
 
   BottomNavItem({
     required this.icon,
     this.activeIcon,
     required this.label,
     this.tooltip,
+    this.hasNotification = false,
+    this.notificationCount = 0,
   });
-} 
+}

@@ -24,11 +24,32 @@ class TaskDetailScreen extends StatelessWidget {
       return Scaffold(
         appBar: AppBar(
           title: const Text('任務不存在'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pop(context),
+          ),
         ),
         body: Center(
-          child: Text(
-            '找不到該任務，可能已被刪除',
-            style: theme.textTheme.bodyLarge,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 64,
+                color: theme.colorScheme.error,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                '找不到該任務，可能已被刪除',
+                style: theme.textTheme.bodyLarge,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('返回'),
+              ),
+            ],
           ),
         ),
       );
@@ -41,21 +62,30 @@ class TaskDetailScreen extends StatelessWidget {
         title: Text('任務詳情'),
         actions: [
           IconButton(
-            icon: Icon(Icons.edit),
-            onPressed: () {
-              Navigator.push(
+            icon: const Icon(Icons.edit),
+            tooltip: '編輯任務',
+            onPressed: () async {
+              final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => AddTaskScreen(taskToEdit: task),
                 ),
               );
+              
+              if (result == true && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('任務已更新'),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
             },
           ),
           IconButton(
-            icon: Icon(Icons.delete),
-            onPressed: () {
-              _showDeleteConfirmation(context, task);
-            },
+            icon: const Icon(Icons.delete),
+            tooltip: '刪除任務',
+            onPressed: () => _showDeleteConfirmation(context, task),
           ),
         ],
       ),
@@ -65,12 +95,46 @@ class TaskDetailScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 任務標題
-              Text(
-                task.title,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+              // 任務標題和狀態
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      task.title,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  if (task.isCompleted)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.tertiary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.check_circle,
+                            size: 16,
+                            color: theme.colorScheme.tertiary,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '已完成',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.tertiary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
               ),
               
               const SizedBox(height: 24),
@@ -93,17 +157,24 @@ class TaskDetailScreen extends StatelessWidget {
                     value: _getPriorityName(task.priority),
                     valueColor: _getPriorityColor(task.priority, context),
                   ),
-                  _buildInfoRow(
-                    context: context, 
-                    icon: Icons.book, 
-                    label: '科目', 
-                    value: subject?.name ?? '未分類',
-                  ),
+                  if (subject != null)
+                    _buildInfoRow(
+                      context: context, 
+                      icon: Icons.book, 
+                      label: '科目', 
+                      value: subject.name,
+                      onTap: () {
+                        // TODO: 導航到科目詳情頁面
+                      },
+                    ),
                   _buildInfoRow(
                     context: context, 
                     icon: Icons.calendar_today, 
                     label: '截止日期', 
                     value: DateUtil.formatDateTime(task.dueDate),
+                    valueColor: task.dueDate.isBefore(DateTime.now()) && !task.isCompleted
+                        ? theme.colorScheme.error
+                        : null,
                   ),
                   if (task.reminderTime != null)
                     _buildInfoRow(
@@ -118,8 +189,100 @@ class TaskDetailScreen extends StatelessWidget {
                     label: '完成狀態', 
                     value: task.isCompleted ? '已完成' : '未完成',
                     valueColor: task.isCompleted 
-                      ? theme.colorScheme.tertiary 
-                      : theme.colorScheme.error,
+                        ? theme.colorScheme.tertiary 
+                        : theme.colorScheme.error,
+                  ),
+                ],
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // 標籤
+              if (task.tags.isNotEmpty)
+                _buildInfoCard(
+                  context: context,
+                  title: '標籤',
+                  children: [
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: task.tags.map((tag) => Chip(
+                        label: Text(tag),
+                        backgroundColor: theme.colorScheme.primaryContainer,
+                        labelStyle: TextStyle(
+                          color: theme.colorScheme.onPrimaryContainer,
+                        ),
+                      )).toList(),
+                    ),
+                  ],
+                ),
+              
+              const SizedBox(height: 16),
+              
+              // 重複設置
+              if (task.repeatType != RepeatType.none)
+                _buildInfoCard(
+                  context: context,
+                  title: '重複設置',
+                  children: [
+                    _buildInfoRow(
+                      context: context,
+                      icon: Icons.repeat,
+                      label: '重複類型',
+                      value: _getRepeatTypeName(task.repeatType),
+                    ),
+                    if (task.repeatConfig != null)
+                      _buildInfoRow(
+                        context: context,
+                        icon: Icons.settings,
+                        label: '重複配置',
+                        value: _formatRepeatConfig(task.repeatConfig!),
+                      ),
+                  ],
+                ),
+              
+              const SizedBox(height: 16),
+              
+              // 學習追蹤
+              _buildInfoCard(
+                context: context,
+                title: '學習追蹤',
+                children: [
+                  if (task.estimatedDuration > 0)
+                    _buildInfoRow(
+                      context: context,
+                      icon: Icons.timer,
+                      label: '預計時間',
+                      value: '${task.estimatedDuration} 分鐘',
+                    ),
+                  if (task.actualDuration > 0)
+                    _buildInfoRow(
+                      context: context,
+                      icon: Icons.timer_outlined,
+                      label: '實際時間',
+                      value: '${task.actualDuration} 分鐘',
+                    ),
+                  if (task.actualDuration > 0 && task.estimatedDuration > 0)
+                    _buildInfoRow(
+                      context: context,
+                      icon: Icons.speed,
+                      label: '學習效率',
+                      value: '${(task.learningEfficiency * 100).toStringAsFixed(1)}%',
+                      valueColor: _getEfficiencyColor(task.learningEfficiency, context),
+                    ),
+                  if (task.learningGoals != null)
+                    _buildInfoRow(
+                      context: context,
+                      icon: Icons.flag,
+                      label: '學習目標',
+                      value: _formatLearningGoals(task.learningGoals!),
+                    ),
+                  _buildInfoRow(
+                    context: context,
+                    icon: Icons.trending_up,
+                    label: '學習進度',
+                    value: '${(task.progress * 100).toStringAsFixed(1)}%',
+                    valueColor: _getProgressColor(task.progress, context),
                   ),
                 ],
               ),
@@ -253,6 +416,7 @@ class TaskDetailScreen extends StatelessWidget {
     required String label,
     required String value,
     Color? valueColor,
+    VoidCallback? onTap,
   }) {
     final theme = Theme.of(context);
     
@@ -422,5 +586,57 @@ class TaskDetailScreen extends StatelessWidget {
       case TaskPriority.urgent:
         return Colors.deepPurple;
     }
+  }
+  
+  String _getRepeatTypeName(RepeatType type) {
+    switch (type) {
+      case RepeatType.none:
+        return '不重複';
+      case RepeatType.daily:
+        return '每天';
+      case RepeatType.weekly:
+        return '每週';
+      case RepeatType.monthly:
+        return '每月';
+      case RepeatType.custom:
+        return '自定義';
+    }
+  }
+
+  String _formatRepeatConfig(Map<String, dynamic> config) {
+    final interval = config['interval'] as int;
+    final unit = config['unit'] as String;
+    switch (unit) {
+      case 'days':
+        return '每 $interval 天';
+      case 'weeks':
+        return '每 $interval 週';
+      case 'months':
+        return '每 $interval 月';
+      default:
+        return '自定義重複';
+    }
+  }
+
+  String _formatLearningGoals(Map<String, dynamic> goals) {
+    final List<String> formattedGoals = [];
+    goals.forEach((key, value) {
+      formattedGoals.add('$key: $value');
+    });
+    return formattedGoals.join('\n');
+  }
+
+  Color _getEfficiencyColor(double efficiency, BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    if (efficiency >= 1.2) return Colors.green;
+    if (efficiency >= 0.8) return Colors.orange;
+    return colorScheme.error;
+  }
+
+  Color _getProgressColor(double progress, BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    if (progress >= 0.8) return Colors.green;
+    if (progress >= 0.5) return Colors.orange;
+    return colorScheme.error;
   }
 } 

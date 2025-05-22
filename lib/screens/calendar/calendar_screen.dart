@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:intl/intl.dart';
 import '../add_task/add_task_screen.dart';
 import '../../models/task.dart';
 import '../../providers/task_provider.dart';
@@ -10,6 +11,7 @@ import '../../widgets/calendar/calendar_view_selector.dart';
 import '../../widgets/calendar/calendar_event_list.dart';
 import '../../utils/date_utils.dart' as app_date_utils;
 import '../../utils/navigation_handler.dart';
+import 'package:table_calendar/table_calendar.dart' as calendar_utils;
 
 // 視圖模式枚舉
 enum CalendarViewMode {
@@ -317,7 +319,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             lastDay: DateTime.utc(2025, 12, 31),
             focusedDay: _focusedDay,
             selectedDayPredicate: (day) {
-              return isSameDay(_selectedDay, day);
+              return calendar_utils.isSameDay(_selectedDay, day);
             },
             calendarFormat: _calendarFormat,
             onFormatChanged: (format) {
@@ -415,7 +417,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           itemBuilder: (context, hour) {
             final tasksAtHour = hourlyTasks[hour] ?? [];
             final isCurrentHour = DateTime.now().hour == hour && 
-                                 isSameDay(DateTime.now(), _selectedDay ?? _focusedDay);
+                                 calendar_utils.isSameDay(DateTime.now(), _selectedDay ?? _focusedDay);
             
             return Column(
               children: [

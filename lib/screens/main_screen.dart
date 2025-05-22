@@ -6,6 +6,7 @@ import '../providers/locale_provider.dart';
 import '../providers/subject_provider.dart';
 import '../widgets/widgets.dart';
 import '../models/models.dart';
+import '../widgets/navigation/expandable_fab.dart';
 
 import 'home/home_screen.dart';
 import 'calendar/calendar_screen.dart';
@@ -193,9 +194,13 @@ class _MainScreenState extends State<MainScreen> {
 
   // 導航到添加任務頁面
   void _navigateToAddTask(TaskType type) {
+    // 使用NavigationHandler進行導航，確保一致的導航體驗
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => AddTaskScreen(initialTaskType: type),
+        builder: (context) => AddTaskScreen(
+          initialTaskType: type,
+          initialDate: DateTime.now().add(const Duration(days: 1)),
+        ),
       ),
     );
   }
@@ -204,6 +209,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode(context);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: SafeArea(
@@ -216,6 +222,16 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
       extendBody: true,
+      floatingActionButton: FloatingActionMenu(
+        items: _fabItems,
+        icon: Icons.add,
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
+        childBackgroundColor: colorScheme.primaryContainer,
+        childForegroundColor: colorScheme.onPrimaryContainer,
+        direction: FloatingActionMenuDirection.topRight,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       bottomNavigationBar: EduriumBottomNavBar(
         currentIndex: _currentIndex,
         onTap: _onBottomNavTapped,
@@ -223,4 +239,4 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
   }
-} 
+}

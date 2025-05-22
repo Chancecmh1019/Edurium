@@ -89,32 +89,34 @@ class AppTheme {
         displayColor: colorScheme.onSurface,
       ),
       typography: Typography.material2021(),
+      // AppBar - Material 3 風格
       appBarTheme: AppBarTheme(
-        backgroundColor: colorScheme.surface,
-        foregroundColor: colorScheme.onSurface,
+        backgroundColor: colorScheme.surfaceVariant,
+        foregroundColor: colorScheme.onSurfaceVariant,
         elevation: 0,
-        scrolledUnderElevation: 2,
+        scrolledUnderElevation: 0,
         centerTitle: true,
         titleTextStyle: GoogleFonts.notoSerif(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: colorScheme.onSurface,
+          fontSize: 22,
+          fontWeight: FontWeight.w500,
+          color: colorScheme.onSurfaceVariant,
         ),
         iconTheme: IconThemeData(
-          color: colorScheme.primary,
+          color: colorScheme.onSurfaceVariant,
           size: 24,
         ),
-        surfaceTintColor: Colors.transparent,
+        surfaceTintColor: colorScheme.surfaceTint,
       ),
+      // 導航欄 - Material 3 風格
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: colorScheme.surface,
-        indicatorColor: colorScheme.primaryContainer,
+        backgroundColor: colorScheme.surfaceVariant,
+        indicatorColor: colorScheme.secondaryContainer,
         labelTextStyle: MaterialStateProperty.resolveWith((states) {
           if (states.contains(MaterialState.selected)) {
             return GoogleFonts.notoSerif(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: colorScheme.primary,
+              color: colorScheme.onSecondaryContainer,
             );
           }
           return GoogleFonts.notoSerif(
@@ -125,7 +127,7 @@ class AppTheme {
         iconTheme: MaterialStateProperty.resolveWith((states) {
           if (states.contains(MaterialState.selected)) {
             return IconThemeData(
-              color: colorScheme.primary,
+              color: colorScheme.onSecondaryContainer,
               size: 24,
             );
           }
@@ -134,42 +136,117 @@ class AppTheme {
             size: 24,
           );
         }),
-        elevation: 2,
-        height: 75,
-        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+        elevation: 0,
+        height: 80,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
       ),
+      // 浮動按鈕 - Material 3 風格
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: colorScheme.tertiaryContainer,
-        foregroundColor: colorScheme.onTertiaryContainer,
-        elevation: 2,
-        highlightElevation: 4,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        backgroundColor: colorScheme.primaryContainer,
+        foregroundColor: colorScheme.onPrimaryContainer,
+        elevation: 3,
+        highlightElevation: 6,
+        shape: const StadiumBorder(),
         extendedPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         extendedTextStyle: GoogleFonts.notoSerif(
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w500,
           fontSize: 14,
         ),
       ),
+      // 卡片 - Material 3 風格
       cardTheme: CardTheme(
-        color: colorScheme.surface,
-        elevation: 0.5,
+        color: colorScheme.surfaceVariant,
+        elevation: 0,
         shadowColor: colorScheme.shadow,
-        surfaceTintColor: Colors.transparent,
+        surfaceTintColor: colorScheme.surfaceTint,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           side: BorderSide(
-            color: colorScheme.outline.withOpacity(0.2),
-            width: 0.5,
+            color: colorScheme.outlineVariant,
+            width: 1.0,
           ),
         ),
         clipBehavior: Clip.antiAlias,
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       ),
+      // 基本按鈕 - Material 3 風格
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: colorScheme.primaryContainer,
+          foregroundColor: colorScheme.onPrimaryContainer,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          shape: const StadiumBorder(),
+          textStyle: GoogleFonts.notoSerif(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+      // 文字按鈕 - Material 3 風格
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: colorScheme.primary,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          shape: const StadiumBorder(),
+          textStyle: GoogleFonts.notoSerif(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+      // 輪廓按鈕 - Material 3 風格
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: colorScheme.onSurfaceVariant,
+          side: BorderSide(color: colorScheme.outline, width: 1),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          shape: const StadiumBorder(),
+          textStyle: GoogleFonts.notoSerif(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+      // 圖標按鈕 - Material 3 風格
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(
+          foregroundColor: colorScheme.onSurfaceVariant,
+          backgroundColor: Colors.transparent,
+          shape: const CircleBorder(),
+          minimumSize: const Size(48, 48),
+        ),
+      ),
+      // 輸入框 - Material 3 風格
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: colorScheme.surfaceVariant.withOpacity(0.5),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(4),
+          borderSide: BorderSide(color: colorScheme.outline, width: 1),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(4),
+          borderSide: BorderSide(color: colorScheme.outline.withOpacity(0.5), width: 1),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(4),
+          borderSide: BorderSide(color: colorScheme.primary, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(4),
+          borderSide: BorderSide(color: colorScheme.error, width: 1),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(4),
+          borderSide: BorderSide(color: colorScheme.error, width: 2),
+        ),
+      ),
       scaffoldBackgroundColor: colorScheme.background,
       splashColor: colorScheme.primary.withOpacity(0.1),
       highlightColor: colorScheme.primary.withOpacity(0.05),
+      // 提示條 - Material 3 風格
       snackBarTheme: SnackBarThemeData(
         backgroundColor: colorScheme.inverseSurface,
         contentTextStyle: GoogleFonts.notoSerif(
@@ -235,32 +312,34 @@ class AppTheme {
         displayColor: colorScheme.onSurface,
       ),
       typography: Typography.material2021(),
+      // AppBar - Material 3 風格
       appBarTheme: AppBarTheme(
-        backgroundColor: colorScheme.surface,
-        foregroundColor: colorScheme.onSurface,
+        backgroundColor: colorScheme.surfaceVariant,
+        foregroundColor: colorScheme.onSurfaceVariant,
         elevation: 0,
-        scrolledUnderElevation: 2,
+        scrolledUnderElevation: 0,
         centerTitle: true,
         titleTextStyle: GoogleFonts.notoSerif(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: colorScheme.onSurface,
+          fontSize: 22,
+          fontWeight: FontWeight.w500,
+          color: colorScheme.onSurfaceVariant,
         ),
         iconTheme: IconThemeData(
-          color: colorScheme.primary,
+          color: colorScheme.onSurfaceVariant,
           size: 24,
         ),
-        surfaceTintColor: Colors.transparent,
+        surfaceTintColor: colorScheme.surfaceTint,
       ),
+      // 導航欄 - Material 3 風格
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: colorScheme.surface,
-        indicatorColor: colorScheme.primaryContainer,
+        backgroundColor: colorScheme.surfaceVariant,
+        indicatorColor: colorScheme.secondaryContainer,
         labelTextStyle: MaterialStateProperty.resolveWith((states) {
           if (states.contains(MaterialState.selected)) {
             return GoogleFonts.notoSerif(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: colorScheme.primary,
+              color: colorScheme.onSecondaryContainer,
             );
           }
           return GoogleFonts.notoSerif(
@@ -271,7 +350,7 @@ class AppTheme {
         iconTheme: MaterialStateProperty.resolveWith((states) {
           if (states.contains(MaterialState.selected)) {
             return IconThemeData(
-              color: colorScheme.primary,
+              color: colorScheme.onSecondaryContainer,
               size: 24,
             );
           }
@@ -280,42 +359,117 @@ class AppTheme {
             size: 24,
           );
         }),
-        elevation: 2,
-        height: 75,
-        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+        elevation: 0,
+        height: 80,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
       ),
+      // 浮動按鈕 - Material 3 風格
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: colorScheme.tertiaryContainer,
-        foregroundColor: colorScheme.onTertiaryContainer,
-        elevation: 2,
-        highlightElevation: 4,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        backgroundColor: colorScheme.primaryContainer,
+        foregroundColor: colorScheme.onPrimaryContainer,
+        elevation: 3,
+        highlightElevation: 6,
+        shape: const StadiumBorder(),
         extendedPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         extendedTextStyle: GoogleFonts.notoSerif(
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w500,
           fontSize: 14,
         ),
       ),
+      // 卡片 - Material 3 風格
       cardTheme: CardTheme(
-        color: colorScheme.surface,
-        elevation: 0.5,
+        color: colorScheme.surfaceVariant,
+        elevation: 0,
         shadowColor: colorScheme.shadow,
-        surfaceTintColor: Colors.transparent,
+        surfaceTintColor: colorScheme.surfaceTint,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           side: BorderSide(
-            color: colorScheme.outline.withOpacity(0.2),
-            width: 0.5,
+            color: colorScheme.outlineVariant,
+            width: 1.0,
           ),
         ),
         clipBehavior: Clip.antiAlias,
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       ),
+      // 基本按鈕 - Material 3 風格
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: colorScheme.primaryContainer,
+          foregroundColor: colorScheme.onPrimaryContainer,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          shape: const StadiumBorder(),
+          textStyle: GoogleFonts.notoSerif(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+      // 文字按鈕 - Material 3 風格
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: colorScheme.primary,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          shape: const StadiumBorder(),
+          textStyle: GoogleFonts.notoSerif(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+      // 輪廓按鈕 - Material 3 風格
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: colorScheme.onSurfaceVariant,
+          side: BorderSide(color: colorScheme.outline, width: 1),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          shape: const StadiumBorder(),
+          textStyle: GoogleFonts.notoSerif(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+      // 圖標按鈕 - Material 3 風格
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(
+          foregroundColor: colorScheme.onSurfaceVariant,
+          backgroundColor: Colors.transparent,
+          shape: const CircleBorder(),
+          minimumSize: const Size(48, 48),
+        ),
+      ),
+      // 輸入框 - Material 3 風格
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: colorScheme.surfaceVariant.withOpacity(0.5),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(4),
+          borderSide: BorderSide(color: colorScheme.outline, width: 1),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(4),
+          borderSide: BorderSide(color: colorScheme.outline.withOpacity(0.5), width: 1),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(4),
+          borderSide: BorderSide(color: colorScheme.primary, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(4),
+          borderSide: BorderSide(color: colorScheme.error, width: 1),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(4),
+          borderSide: BorderSide(color: colorScheme.error, width: 2),
+        ),
+      ),
       scaffoldBackgroundColor: colorScheme.background,
       splashColor: colorScheme.primary.withOpacity(0.1),
       highlightColor: colorScheme.primary.withOpacity(0.05),
+      // 提示條 - Material 3 風格
       snackBarTheme: SnackBarThemeData(
         backgroundColor: colorScheme.inverseSurface,
         contentTextStyle: GoogleFonts.notoSerif(
@@ -344,4 +498,4 @@ class AppTheme {
         return brightness == Brightness.dark ? darkTheme() : lightTheme();
     }
   }
-} 
+}

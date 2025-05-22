@@ -177,10 +177,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: onboardingItems[_currentPage].color,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    elevation: 0,
+                    shape: const StadiumBorder(),
                   ),
                   child: Text(
                     _currentPage < onboardingItems.length - 1
@@ -272,4 +272,4 @@ class OnboardingItem {
     required this.icon,
     required this.color,
   });
-} 
+}

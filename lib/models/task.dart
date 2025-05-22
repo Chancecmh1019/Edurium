@@ -4,7 +4,7 @@ import 'subject.dart';
 
 part 'task.g.dart';
 
-@HiveType(typeId: 1)
+@HiveType(typeId: 0)
 enum TaskType {
   @HiveField(0)
   homework,
@@ -28,7 +28,7 @@ enum TaskType {
   other
 }
 
-@HiveType(typeId: 2)
+@HiveType(typeId: 1)
 enum TaskPriority {
   @HiveField(0)
   low,
@@ -43,7 +43,25 @@ enum TaskPriority {
   urgent
 }
 
-@HiveType(typeId: 0)
+@HiveType(typeId: 2)
+enum RepeatType {
+  @HiveField(0)
+  none,
+  
+  @HiveField(1)
+  daily,
+  
+  @HiveField(2)
+  weekly,
+  
+  @HiveField(3)
+  monthly,
+  
+  @HiveField(4)
+  custom
+}
+
+@HiveType(typeId: 3)
 class Task extends HiveObject {
   @HiveField(0)
   final String id;
@@ -55,67 +73,67 @@ class Task extends HiveObject {
   String? description;
   
   @HiveField(3)
-  DateTime dueDate;
-  
-  @HiveField(4)
-  bool isCompleted;
-  
-  @HiveField(5)
   TaskType taskType;
   
-  @HiveField(6)
+  @HiveField(4)
+  DateTime dueDate;
+  
+  @HiveField(5)
   TaskPriority priority;
   
-  @HiveField(7)
+  @HiveField(6)
   String? subjectId;
   
-  @HiveField(8)
+  @HiveField(7)
   String? teacherId;
   
-  @HiveField(9)
+  @HiveField(8)
   DateTime? reminderTime;
+  
+  @HiveField(9)
+  bool isCompleted;
   
   @HiveField(10)
   DateTime createdAt;
   
   @HiveField(11)
-  DateTime? updatedAt;
+  DateTime updatedAt;
   
   @HiveField(12)
-  bool isRecurring;
+  List<String> tags;
   
   @HiveField(13)
-  int? recurringInterval; // 以天為單位
+  RepeatType repeatType;
   
   @HiveField(14)
-  DateTime? completedAt;
+  Map<String, dynamic>? repeatConfig;
   
   @HiveField(15)
-  bool isArchived;
+  int estimatedDuration; // 預計完成時間（分鐘）
   
   @HiveField(16)
-  String? notes;
+  int actualDuration; // 實際完成時間（分鐘）
   
   @HiveField(17)
-  List<String>? tags;
+  Map<String, dynamic>? learningGoals;
   
   @HiveField(18)
-  String? attachmentPath;
+  double progress; // 學習進度（0-1）
   
   @HiveField(19)
-  String? subjectName; // 科目名稱，用於顯示
+  Map<String, dynamic>? extras;
   
   @HiveField(20)
-  int? duration; // 任務持續時間（分鐘），用於計算結束時間
-  
-  @HiveField(21)
-  Map<String, dynamic>? extras; // 額外屬性
-  
-  @HiveField(22)
   bool hasTime = false; // 是否有時間
   
-  @HiveField(23)
+  @HiveField(21)
   bool hasAttachments = false; // 是否有附件
+  
+  @HiveField(22)
+  String? subjectName; // 科目名稱，用於顯示
+  
+  @HiveField(23)
+  int? duration; // 任務持續時間（分鐘），用於計算結束時間
   
   Subject? _subject;
   
@@ -133,88 +151,173 @@ class Task extends HiveObject {
   }
   
   Task({
-    String? id,
+    required this.id,
     required this.title,
     this.description,
+    required this.taskType,
     required this.dueDate,
-    this.isCompleted = false,
-    this.taskType = TaskType.other,
-    this.priority = TaskPriority.medium,
+    required this.priority,
     this.subjectId,
     this.teacherId,
     this.reminderTime,
-    DateTime? createdAt,
-    this.updatedAt,
-    this.isRecurring = false,
-    this.recurringInterval,
-    this.completedAt,
-    this.isArchived = false,
-    this.notes,
-    this.tags,
-    this.attachmentPath,
-    this.subjectName,
-    this.duration,
+    this.isCompleted = false,
+    required this.createdAt,
+    required this.updatedAt,
+    List<String>? tags,
+    this.repeatType = RepeatType.none,
+    this.repeatConfig,
+    this.estimatedDuration = 0,
+    this.actualDuration = 0,
+    this.learningGoals,
+    this.progress = 0.0,
     this.extras,
     this.hasTime = false,
     this.hasAttachments = false,
-  }) : 
-    id = id ?? const Uuid().v4(),
-    createdAt = createdAt ?? DateTime.now();
+    this.subjectName,
+    this.duration,
+    bool? isImportant,
+  }) : tags = tags ?? [];
   
   Task copyWith({
+    String? id,
     String? title,
     String? description,
-    DateTime? dueDate,
-    bool? isCompleted,
     TaskType? taskType,
+    DateTime? dueDate,
     TaskPriority? priority,
     String? subjectId,
     String? teacherId,
     DateTime? reminderTime,
-    DateTime? updatedAt,
-    bool? isRecurring,
-    int? recurringInterval,
-    DateTime? completedAt,
-    bool? isArchived,
-    String? notes,
+    bool? isCompleted,
     List<String>? tags,
-    String? attachmentPath,
-    String? subjectName,
-    int? duration,
+    RepeatType? repeatType,
+    Map<String, dynamic>? repeatConfig,
+    int? estimatedDuration,
+    int? actualDuration,
+    Map<String, dynamic>? learningGoals,
+    double? progress,
     Map<String, dynamic>? extras,
     bool? hasTime,
     bool? hasAttachments,
+    String? subjectName,
+    int? duration,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return Task(
-      id: this.id,
+      id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
-      dueDate: dueDate ?? this.dueDate,
-      isCompleted: isCompleted ?? this.isCompleted,
       taskType: taskType ?? this.taskType,
+      dueDate: dueDate ?? this.dueDate,
       priority: priority ?? this.priority,
       subjectId: subjectId ?? this.subjectId,
       teacherId: teacherId ?? this.teacherId,
       reminderTime: reminderTime ?? this.reminderTime,
-      createdAt: this.createdAt,
+      isCompleted: isCompleted ?? this.isCompleted,
+      createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? DateTime.now(),
-      isRecurring: isRecurring ?? this.isRecurring,
-      recurringInterval: recurringInterval ?? this.recurringInterval,
-      completedAt: completedAt ?? (isCompleted == true && this.completedAt == null ? DateTime.now() : this.completedAt),
-      isArchived: isArchived ?? this.isArchived,
-      notes: notes ?? this.notes,
       tags: tags ?? this.tags,
-      attachmentPath: attachmentPath ?? this.attachmentPath,
-      subjectName: subjectName ?? this.subjectName,
-      duration: duration ?? this.duration,
+      repeatType: repeatType ?? this.repeatType,
+      repeatConfig: repeatConfig ?? this.repeatConfig,
+      estimatedDuration: estimatedDuration ?? this.estimatedDuration,
+      actualDuration: actualDuration ?? this.actualDuration,
+      learningGoals: learningGoals ?? this.learningGoals,
+      progress: progress ?? this.progress,
       extras: extras ?? this.extras,
       hasTime: hasTime ?? this.hasTime,
       hasAttachments: hasAttachments ?? this.hasAttachments,
+      subjectName: subjectName ?? this.subjectName,
+      duration: duration ?? this.duration,
     );
   }
   
   @override
   String toString() {
     return 'Task{id: $id, title: $title, dueDate: $dueDate, isCompleted: $isCompleted}';
+  }
+  
+  // 計算學習效率
+  double get learningEfficiency {
+    if (estimatedDuration == 0 || actualDuration == 0) return 0.0;
+    return estimatedDuration / actualDuration;
+  }
+  
+  // 檢查是否需要重複
+  bool get needsRepeat {
+    if (repeatType == RepeatType.none) return false;
+    if (!isCompleted) return false;
+    
+    final now = DateTime.now();
+    switch (repeatType) {
+      case RepeatType.daily:
+        return true;
+      case RepeatType.weekly:
+        return now.difference(dueDate).inDays >= 7;
+      case RepeatType.monthly:
+        return now.difference(dueDate).inDays >= 30;
+      case RepeatType.custom:
+        if (repeatConfig == null) return false;
+        final interval = repeatConfig!['interval'] as int;
+        final unit = repeatConfig!['unit'] as String;
+        switch (unit) {
+          case 'days':
+            return now.difference(dueDate).inDays >= interval;
+          case 'weeks':
+            return now.difference(dueDate).inDays >= interval * 7;
+          case 'months':
+            return now.difference(dueDate).inDays >= interval * 30;
+          default:
+            return false;
+        }
+      default:
+        return false;
+    }
+  }
+  
+  // 生成下一個重複任務
+  Task? generateNextRepeatTask() {
+    if (!needsRepeat) return null;
+
+    final nextDueDate = _calculateNextDueDate();
+    if (nextDueDate == null) return null;
+
+    return copyWith(
+      id: const Uuid().v4(),
+      dueDate: nextDueDate,
+      isCompleted: false,
+      actualDuration: 0,
+      progress: 0.0,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+  }
+  
+  DateTime? _calculateNextDueDate() {
+    final now = DateTime.now();
+    switch (repeatType) {
+      case RepeatType.daily:
+        return DateTime(now.year, now.month, now.day + 1);
+      case RepeatType.weekly:
+        return DateTime(now.year, now.month, now.day + 7);
+      case RepeatType.monthly:
+        return DateTime(now.year, now.month + 1, now.day);
+      case RepeatType.custom:
+        if (repeatConfig == null) return null;
+        final interval = repeatConfig!['interval'] as int;
+        final unit = repeatConfig!['unit'] as String;
+        switch (unit) {
+          case 'days':
+            return DateTime(now.year, now.month, now.day + interval);
+          case 'weeks':
+            return DateTime(now.year, now.month, now.day + interval * 7);
+          case 'months':
+            return DateTime(now.year, now.month + interval, now.day);
+          default:
+            return null;
+        }
+      default:
+        return null;
+    }
   }
 } 
